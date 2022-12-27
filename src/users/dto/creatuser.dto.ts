@@ -1,16 +1,6 @@
-import {
-  IsAlphanumeric,
-  IsEmail,
-  IsEmpty,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
-import { ignoreElements } from 'rxjs';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUserDto {
-  @IsEmpty()
-  id: number;
-
   @IsString()
   @IsNotEmpty()
   username: string;
@@ -20,10 +10,10 @@ export class CreateUserDto {
   email: string;
 
   @IsNotEmpty()
-  age: number;
+  password: string;
 
   @IsNotEmpty()
-  password: string;
+  confirmPassword: string;
 }
 
 export class ListAllEntitiesDto {

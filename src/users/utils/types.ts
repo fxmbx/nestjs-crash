@@ -1,5 +1,10 @@
 export type CreateUserType = {
-  id: number;
+  username: string;
+  email: string;
+  password: string;
+};
+
+export type UpdateUserType = {
   username: string;
   email: string;
 };

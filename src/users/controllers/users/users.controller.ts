@@ -4,8 +4,8 @@ import {
   Get,
   Post,
   Param,
-  Req,
-  Res,
+  Put,
+  Delete,
   Query,
   UsePipes,
   ValidationPipe,
@@ -15,91 +15,71 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto, ListAllEntitiesDto } from 'src/users/dto/users.dto';
-import { Request, Response } from 'express';
+import { CreateUserDto, ListAllEntitiesDto } from 'src/users/dto/creatuser.dto';
 import { UsersService } from 'src/users/services/users/users.service';
 import { ValidateCreateUserPipe } from 'src/users/pipes/validate-create-user/validate-create-user.pipe';
 import { AuthGuard } from 'src/users/guards/auth/auth.guard';
+import { UpdateUserDto } from 'src/users/dto/updateuser.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
 export class UsersController {
   constructor(private userService: UsersService) {}
+
   @Get('list-users')
-  getUsers(@Query() query: ListAllEntitiesDto) {
-    return {
-      message: 'following SOLID, D',
-      data: this.userService.fetchUsers(),
-    };
-  }
+  async getUsers(@Query() query: ListAllEntitiesDto) {
+    try {
+      var user = await this.userService.listUsers();
 
-  @Get('posts')
-  getUsersPost(@Query('sortDesc', ParseBoolPipe) sortDesc: boolean) {
-    console.log(sortDesc);
-
-    return [
-      {
-        username: 'Funmibi',
-        email: 'funbiolaore@gmail.com',
-        posts: [
-          {
-            id: 1,
-            title: 'post 1',
-          },
-          {
-            id: 2,
-            title: 'post 2',
-          },
-        ],
-      },
-    ];
+      return {
+        message: 'fetched users',
+        data: user,
+      };
+    } catch (error) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
   }
 
   @Post('register-user')
   @UsePipes(new ValidationPipe())
-  registerUser(@Body(ValidateCreateUserPipe) createUserDto: CreateUserDto) {
+  async registerUser(
+    @Body(ValidateCreateUserPipe) createUserDto: CreateUserDto,
+  ) {
     console.log(createUserDto);
-    var serviceResoinse = this.userService.createUser(createUserDto);
+    const { confirmPassword, ...userDetails } = createUserDto;
+    var user = await this.userService.createUser(userDetails);
 
     return {
       message: 'user created',
-      data: serviceResoinse,
-    };
-  }
-
-  @Post('create')
-  createUser(@Req() request: Request, @Res() response: Response) {
-    response.status(200).json({
-      message: 'created',
-      data: request.body,
-      success: true,
-    });
-  }
-
-  @Get(':id')
-  getById(@Param('id', ParseIntPipe) id: number): any {
-    var user = this.userService.fetchUseById(id);
-    if (user.length < 1)
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-
-    return {
-      message: 'user feteched',
       data: user,
     };
   }
 
-  @Get('get-user/:id/:postid')
-  getUserById(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('postid') postId: string,
+  @Put('update-user/:id')
+  @UsePipes(new ValidationPipe())
+  async updateUser(
+    @Param('id', ParseIntPipe)
+    id: number,
+    @Body() updateUserDetails: UpdateUserDto,
   ) {
-    console.log(id);
     return {
-      message: 'fetech users',
-      data: {
-        id,
-        postId,
-      },
+      message: 'updated user',
+      data: await this.userService.updateUsers(id, updateUserDetails),
+    };
+  }
+
+  @Get(':id')
+  async getById(@Param('id', ParseIntPipe) id: number) {
+    return {
+      message: 'user feteched',
+      data: await this.userService.getUserByID(id),
+    };
+  }
+  @Delete(':id')
+  async deleteById(@Param('id', ParseIntPipe) id: number) {
+    return {
+      message: 'user deleted',
+      data: await this.userService.deleteUserByID(id),
     };
   }
 }

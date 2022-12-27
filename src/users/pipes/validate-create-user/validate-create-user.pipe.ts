@@ -5,15 +5,15 @@ import {
   Injectable,
   PipeTransform,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/users/dto/users.dto';
+import { CreateUserDto } from 'src/users/dto/creatuser.dto';
 
 @Injectable()
 export class ValidateCreateUserPipe implements PipeTransform {
   minNumberOfChar: number = 8;
   transform(value: CreateUserDto, metadata: ArgumentMetadata) {
-    console.log('value');
-    console.log(value);
-    console.log('meatadata: ', metadata);
+    // console.log('value');
+    // console.log(value);
+    // console.log('meatadata: ', metadata);
 
     if (value.password.length < this.minNumberOfChar) {
       throw new HttpException(
@@ -30,15 +30,12 @@ export class ValidateCreateUserPipe implements PipeTransform {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const parseAgeInt = parseInt(value.age.toString());
-    if (isNaN(parseAgeInt)) {
-      console.log(`${value.age} is not a number`);
+    if (value.confirmPassword !== value.password) {
       throw new HttpException(
-        'Invalid Data Type for property age. Expected Number',
+        'password and confirm password do not match',
         HttpStatus.BAD_REQUEST,
       );
     }
-
     return value;
   }
 }

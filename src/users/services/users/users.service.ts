@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { isEmpty, isNotEmptyObject } from 'class-validator';
-import { CreateUserDto } from 'src/users/dto/users.dto';
-import { CreateUserType } from 'src/users/utils/types';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/typeorm/entities/user';
+import { CreateUserType, UpdateUserType } from 'src/users/utils/types';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private fakeUsers: Array<CreateUserType> = [
-    { id: 1, username: 'st_funbi', email: 'stfunbi@email.com' },
-    { id: 2, username: 'jon_snow', email: 'jon@email.com' },
-  ];
-  fetchUsers() {
-    return this.fakeUsers;
+  /**
+   *
+   */
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+  ) {}
+  createUser(userDetails: CreateUserType): Promise<UserEntity> {
+    try {
+      const newUser = this.userRepository.create({
+        ...userDetails,
+        created_at: new Date(),
+      });
+      return this.userRepository.save(newUser);
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-  createUser(createUser: CreateUserType): CreateUserType {
-    createUser.id = this.fakeUsers.length + 1;
-    this.fakeUsers.push(createUser);
-    return createUser;
+  async listUsers(): Promise<UserEntity[]> {
+    try {
+      return this.userRepository.find();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-  fetchUseById(id: number): CreateUserType[] {
-    var user = this.fakeUsers.filter((data) => data.id === id);
-    console.log(user);
 
-    return user;
+  async updateUsers(id: number, updateuserDetails: UpdateUserType) {
+    try {
+      return await this.userRepository.update(
+        { id: id },
+        { ...updateuserDetails },
+      );
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteUserByID(id: number) {
+    try {
+      return await this.userRepository.delete({ id: id });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getUserByID(id: number): Promise<UserEntity> {
+    try {
+      return await this.userRepository.findOneBy({ id: id });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
