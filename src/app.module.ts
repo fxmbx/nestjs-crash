@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PostEntity } from './typeorm/entities/post';
+import { ProfileEntity } from './typeorm/entities/profile';
 import { UserEntity } from './typeorm/entities/user';
 import { UsersModule } from './users/users.module';
 
@@ -13,7 +15,7 @@ import { UsersModule } from './users/users.module';
       username: 'root',
       password: 'P@!',
       database: 'nestjs_mysql_tutorial',
-      entities: [UserEntity],
+      entities: [UserEntity, ProfileEntity, PostEntity],
       synchronize: true,
     }),
   ],

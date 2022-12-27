@@ -1,5 +1,15 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { HashPassword } from 'src/users/utils/password';
+import { ProfileEntity } from './profile';
+import { PostEntity } from './post';
 @Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -16,6 +26,14 @@ export class UserEntity {
 
   @Column()
   created_at: Date;
+
+  @OneToOne(() => ProfileEntity)
+  @JoinColumn()
+  profile: ProfileEntity;
+
+  @OneToMany(() => PostEntity, (post) => post.user)
+  @JoinColumn()
+  posts: PostEntity[];
 
   @BeforeInsert()
   async hashpassword() {

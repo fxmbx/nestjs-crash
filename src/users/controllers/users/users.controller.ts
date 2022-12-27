@@ -20,6 +20,8 @@ import { UsersService } from 'src/users/services/users/users.service';
 import { ValidateCreateUserPipe } from 'src/users/pipes/validate-create-user/validate-create-user.pipe';
 import { AuthGuard } from 'src/users/guards/auth/auth.guard';
 import { UpdateUserDto } from 'src/users/dto/updateuser.dto';
+import { ValidateCreateUserProfilePipe } from 'src/users/pipes/validate-create-user-profile/validate-create-user-profile.pipe';
+import { CreateUserProfileDto } from 'src/users/dto/createuserprofile.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -80,6 +82,23 @@ export class UsersController {
     return {
       message: 'user deleted',
       data: await this.userService.deleteUserByID(id),
+    };
+  }
+
+  @Post(':id/profile')
+  @UsePipes(new ValidationPipe())
+  async createUserProfile(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidateCreateUserProfilePipe)
+    createUserProfile: CreateUserProfileDto,
+  ) {
+    var upserProfile = await this.userService.createUserProfile(
+      id,
+      createUserProfile,
+    );
+    return {
+      message: 'user proile created',
+      data: upserProfile,
     };
   }
 }
