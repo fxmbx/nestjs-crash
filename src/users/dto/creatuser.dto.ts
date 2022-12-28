@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { UserRolesEnum } from '../utils/types';
 
 export class CreateUserDto {
   @IsString()
@@ -14,6 +15,8 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   confirmPassword: string;
+
+  role: UserRolesEnum;
 }
 
 export class ListAllEntitiesDto {

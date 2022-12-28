@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
+import { UserRolesEnum } from '../utils/types';
 
 export class CreatePostDTO {
   @IsNotEmpty()
@@ -6,4 +7,5 @@ export class CreatePostDTO {
   @IsNotEmpty()
   description: string;
   image_url: string;
+  role: UserRolesEnum;
 }

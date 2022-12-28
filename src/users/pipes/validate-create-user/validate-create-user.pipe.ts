@@ -6,15 +6,12 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/creatuser.dto';
+import { UserRolesEnum } from 'src/users/utils/types';
 
 @Injectable()
 export class ValidateCreateUserPipe implements PipeTransform {
   minNumberOfChar: number = 8;
   transform(value: CreateUserDto, metadata: ArgumentMetadata) {
-    // console.log('value');
-    // console.log(value);
-    // console.log('meatadata: ', metadata);
-
     if (value.password.length < this.minNumberOfChar) {
       throw new HttpException(
         'password length too short',
@@ -35,6 +32,9 @@ export class ValidateCreateUserPipe implements PipeTransform {
         'password and confirm password do not match',
         HttpStatus.BAD_REQUEST,
       );
+    }
+    if (value.role.length < 1) {
+      value.role = UserRolesEnum.REGULARUSER;
     }
     return value;
   }

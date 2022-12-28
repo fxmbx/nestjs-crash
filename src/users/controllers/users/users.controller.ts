@@ -10,10 +10,11 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
-  ParseBoolPipe,
   HttpException,
   HttpStatus,
   UseGuards,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto, ListAllEntitiesDto } from 'src/users/dto/creatuser.dto';
 import { UsersService } from 'src/users/services/users/users.service';
@@ -25,6 +26,7 @@ import { CreateUserProfileDto } from 'src/users/dto/createuserprofile.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private userService: UsersService) {}
 
@@ -47,7 +49,6 @@ export class UsersController {
   async registerUser(
     @Body(ValidateCreateUserPipe) createUserDto: CreateUserDto,
   ) {
-    console.log(createUserDto);
     const { confirmPassword, ...userDetails } = createUserDto;
     var user = await this.userService.createUser(userDetails);
 
@@ -69,7 +70,7 @@ export class UsersController {
       data: await this.userService.updateUsers(id, updateUserDetails),
     };
   }
-
+  j;
   @Get(':id')
   async getById(@Param('id', ParseIntPipe) id: number) {
     return {

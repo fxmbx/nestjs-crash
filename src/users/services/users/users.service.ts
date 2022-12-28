@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UseInterceptors,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProfileEntity } from 'src/typeorm/entities/profile';
 import { UserEntity } from 'src/typeorm/entities/user';
@@ -20,6 +26,7 @@ export class UsersService {
     @InjectRepository(ProfileEntity)
     private profileRepository: Repository<ProfileEntity>,
   ) {}
+
   createUser(userDetails: CreateUserType): Promise<UserEntity> {
     try {
       const newUser = this.userRepository.create({
@@ -32,6 +39,7 @@ export class UsersService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
   async listUsers(): Promise<UserEntity[]> {
     try {
       return this.userRepository.find({ relations: ['profile', 'posts'] });
@@ -66,6 +74,7 @@ export class UsersService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
   async createUserProfile(
     id: number,
     createUserProfileDetails: CreateUserProfileType,

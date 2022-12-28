@@ -1,8 +1,7 @@
-import { UserEntity } from 'src/typeorm/entities/user';
-
 export type CreateUserType = {
   username: string;
   email: string;
+  role: UserRolesEnum;
   password: string;
 };
 
@@ -22,4 +21,15 @@ export type CreatePostType = {
   title: string;
   description: string;
   image_url: string;
+};
+
+export enum UserRolesEnum {
+  REGULARUSER = 'regular_user',
+  POSTUSER = 'post_user',
+  ADMINUSER = 'admin_user',
+}
+
+export type Tokens = {
+  access_token: string;
+  refresh_token: string;
 };

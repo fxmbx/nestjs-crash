@@ -7,9 +7,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { HashPassword } from 'src/users/utils/password';
+import { HashData } from 'src/users/utils/hash.helper';
 import { ProfileEntity } from './profile';
 import { PostEntity } from './post';
+import { Exclude } from 'class-transformer';
+import { UserRolesEnum } from 'src/users/utils/types';
 @Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -19,13 +21,21 @@ export class UserEntity {
   username: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  created_at: Date;
+  @Column({
+    type: 'enum',
+    enum: UserRolesEnum,
+    default: UserRolesEnum.REGULARUSER,
+  })
+  role: UserRolesEnum;
+
+  @Column({ nullable: true })
+  refresh_token: string;
 
   @OneToOne(() => ProfileEntity)
   @JoinColumn()
@@ -35,8 +45,18 @@ export class UserEntity {
   @JoinColumn()
   posts: PostEntity[];
 
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    onUpdate: 'NOW()',
+    nullable: true,
+  })
+  updated_at: Date;
+
   @BeforeInsert()
   async hashpassword() {
-    this.password = await HashPassword(this.password);
+    this.password = await HashData(this.password);
   }
 }

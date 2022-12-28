@@ -15,11 +15,23 @@ import { UsersService } from './services/users/users.service';
 import { PostsService } from './services/posts/posts.service';
 import { PostController } from './controllers/post/post.controller';
 import { AuthController } from './controllers/auth/auth.controller';
+import { AuthService } from './services/auth/auth.service';
+import { AccessTokenJwtStrategy, RefreshTokenJwtStrategy } from './startegies';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, ProfileEntity, PostEntity])],
+  imports: [
+    JwtModule.register({}),
+    TypeOrmModule.forFeature([UserEntity, ProfileEntity, PostEntity]),
+  ],
   controllers: [UsersController, PostController, AuthController],
-  providers: [UsersService, PostsService],
+  providers: [
+    UsersService,
+    PostsService,
+    AuthService,
+    AccessTokenJwtStrategy,
+    RefreshTokenJwtStrategy,
+  ],
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
